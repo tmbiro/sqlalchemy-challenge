@@ -42,8 +42,8 @@ def welcome():
         f"<b>Weather stations:</b> <br/>/api/v1.0/stations<br/>"
         f"<br/><b>Precipitation measurements:</b> <br/>/api/v1.0/precipitation<br/>"
         f"<br/><b>Temperature measurements:</b> <br/>/api/v1.0/tobs<br/>"
-        f"<br/><b>Temperature information for a specific date <br/>(replace YYYY-MM-DD with desired date):</b> <br/>/api/v1.0/YYYY-MM-DD<br/>"
-        f"<br/><b>Temperature information for a date range <br/>(replace YYYY-MM-DD with start and end dates, respectively):</b> <br/>/api/v1.0/YYYY-MM-DD/YYYY-MM-DD"
+        f"<br/><b>Temperature information for a specific date <br/>(add date to end using YYYY-MM-DD format):</b> <br/>/api/v1.0/<start><br/>"
+        f"<br/><b>Temperature information for a date range <br/>(add start and end dates to end using YYYY-MM-DD format, with '/' in-between the dates):</b> <br/>/api/v1.0/<start>/<end>"
     )
 
 @app.route("/api/v1.0/precipitation")
@@ -89,6 +89,17 @@ def names():
     session.close()
 
     return jsonify(dict(last_year_data))
+
+@app.route("/api/v1.0/stations")
+def stations():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    station_data = session.query(Station.station, Station.name).all()
+
+    session.close()
+
+    return jsonify(dict(station_data))
 
 if __name__ == '__main__':
     app.run(debug=True)
