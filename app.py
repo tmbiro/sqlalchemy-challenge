@@ -39,11 +39,11 @@ def welcome():
     """List all available api routes."""
     return (
         f"<h3>Available Routes:</h3><br/>"
-        f"<b>Weather stations:</b> /api/v1.0/stations<br/>"
-        f"<b>Precipitation measurements:</b> /api/v1.0/precipitation<br/>"
-        f"<b>Temperature measurements:</b> /api/v1.0/tobs<br/>"
-        f"<b>Temperature information for a specific date (replace YYYY-MM-DD with desired date):</b> /api/v1.0/YYYY-MM-DD<br/>"
-        f"<b>Temperature information for a date range (replace YYYY-MM-DD with start and end dates, respectively):</b> /api/v1.0/YYYY-MM-DD/YYYY-MM-DD"
+        f"<b>Weather stations:</b> <br/>/api/v1.0/stations<br/>"
+        f"<br/><b>Precipitation measurements:</b> <br/>/api/v1.0/precipitation<br/>"
+        f"<br/><b>Temperature measurements:</b> <br/>/api/v1.0/tobs<br/>"
+        f"<br/><b>Temperature information for a specific date <br/>(replace YYYY-MM-DD with desired date):</b> <br/>/api/v1.0/YYYY-MM-DD<br/>"
+        f"<br/><b>Temperature information for a date range <br/>(replace YYYY-MM-DD with start and end dates, respectively):</b> <br/>/api/v1.0/YYYY-MM-DD/YYYY-MM-DD"
     )
 
 @app.route("/api/v1.0/precipitation")
