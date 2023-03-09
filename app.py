@@ -33,6 +33,7 @@ app = Flask(__name__)
 # Flask Routes
 #################################################
 
+#List all the available routes
 @app.route("/")
 def welcome():
     """List all available api routes."""
@@ -46,6 +47,7 @@ def welcome():
         f"<br/><b>Note: The last date recorded in the dataset is 2017-08-23"
     )
 
+#Convert the query results from your precipitation analysis (i.e. retrieve only the last 12 months of data) to a dictionary using date as the key and prcp as the value. Return the JSON representation of your dictionary.
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     # Create our session (link) from Python to the DB
@@ -62,19 +64,23 @@ def precipitation():
 
     session.close()
 
+    # Return JSON representation as dictionary.
     return jsonify(dict(last_year_data))
 
+# Return a JSON list of stations from the dataset.
 @app.route("/api/v1.0/stations")
 def stations():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    station_data = session.query(Station.station, Station.name).all()
+    station_data = session.query(Station.station, Station.name).all() #Grab stations and their names
 
     session.close()
 
+    #Return a JSON list
     return jsonify(dict(station_data))
 
+#Query the dates and temperature observations of the most-active station for the previous year of data. Return a JSON list of temperature observations for the previous year.
 @app.route("/api/v1.0/tobs")
 def temperature():
     # Create our session (link) from Python to the DB
@@ -82,16 +88,17 @@ def temperature():
 
     """Return a list of all temperature measures from the latest year in the dataset"""
 
-    # Perform a query to retrieve the data and precipitation scores
+    # Perform a query to retrieve the data and temperature scores
     temp_data = (
         session
-        .query(Measurement.date, Measurement.tobs) #query the measurement date and precipitation columns
+        .query(Measurement.date, Measurement.tobs) #query the measurement date and temperature columns
         .filter(Measurement.date >= '2016-08-23') #only keep dates that are greater than or equal to '2016-08-23'
         .filter(Measurement.station == 'USC00519281') #only keep data from the most active station
         .all()) #grab everything that matches the filter
 
     session.close()
 
+    #Return a JSON list
     return jsonify(dict(temp_data))
 
 @app.route("/api/v1.0/<start>")
@@ -102,22 +109,23 @@ def date(start):
     # Change the date in string format to datatime.date
     start = dt.datetime.strptime(start, '%Y-%m-%d').date()
 
-    # Perform a query to retrieve the data and precipitation scores
+    # Perform a query to retrieve the data and temperature scores
     temp_data = (
         session
         .query(
-            func.min(Measurement.tobs), 
-            func.max(Measurement.tobs), 
-            func.avg(Measurement.tobs)
+            func.min(Measurement.tobs), #Obtain the lowest of temperature
+            func.max(Measurement.tobs), #Obtain the highest of temperature
+            func.avg(Measurement.tobs) #Obtain the average temperature
             )
-        .filter(Measurement.date >= start)
-        .all()
+        .filter(Measurement.date >= start) #Filter based on date
+        .all() #Show all
     )
     
-    (min, max, mean) = temp_data[0]
+    (min, max, mean) = temp_data[0] #Separate tuple into variables
 
     session.close()
 
+    #Reture a JSON list
     return jsonify(f"Start date: {start}",f"Temperature (degrees Fahrenheit) High: {round(min,1)}, Low: {round(max,1)}, Average: {round(mean,1)}")
 
 @app.route("/api/v1.0/<start>/<end>")
@@ -129,23 +137,24 @@ def dates(start, end):
     start = dt.datetime.strptime(start, '%Y-%m-%d').date()
     end = dt.datetime.strptime(end, '%Y-%m-%d').date()
 
-    # Perform a query to retrieve the data and precipitation scores
+    # Perform a query to retrieve the data and temperature scores
     temp_data = (
         session
         .query(
-            func.min(Measurement.tobs), 
-            func.max(Measurement.tobs), 
-            func.avg(Measurement.tobs)
+            func.min(Measurement.tobs), #Obtain the lowest of temperature
+            func.max(Measurement.tobs), #Obtain the highest of temperature
+            func.avg(Measurement.tobs) #Obtain the average temperature
             )
-        .filter(Measurement.date >= start)
-        .filter(Measurement.date <= end)
-        .all()
+        .filter(Measurement.date >= start) #Filter based on start date
+        .filter(Measurement.date <= end) #Filter based on end date
+        .all() #Show all
     )
     
-    (min, max, mean) = temp_data[0]
+    (min, max, mean) = temp_data[0] #Turn tuple into variables
 
     session.close()
 
+    #Return a JSON list
     return jsonify(f"Start date: {start}, End date: {end}",f"Temperature (degrees Fahrenheit) High: {round(min,1)}, Low: {round(max,1)}, Average: {round(mean,1)}")
 
 if __name__ == '__main__':
