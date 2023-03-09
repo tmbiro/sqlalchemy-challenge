@@ -1,4 +1,5 @@
 import pandas as pd
+import datetime as dt
 
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -46,7 +47,7 @@ def welcome():
     )
 
 @app.route("/api/v1.0/precipitation")
-def precip():
+def precipitation():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
@@ -75,7 +76,7 @@ def stations():
     return jsonify(dict(station_data))
 
 @app.route("/api/v1.0/tobs")
-def precipitation():
+def temperature():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
@@ -92,6 +93,60 @@ def precipitation():
     session.close()
 
     return jsonify(dict(temp_data))
+
+@app.route("/api/v1.0/<start>")
+def date(start):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    # Change the date in string format to datatime.date
+    start = dt.datetime.strptime(start, '%Y-%m-%d').date()
+
+    # Perform a query to retrieve the data and precipitation scores
+    temp_data = (
+        session
+        .query(
+            func.min(Measurement.tobs), 
+            func.max(Measurement.tobs), 
+            func.avg(Measurement.tobs)
+            )
+        .filter(Measurement.date >= start)
+        .all()
+    )
+    
+    (min, max, mean) = temp_data[0]
+
+    session.close()
+
+    return jsonify(f"Start date: {start}",f"Temperature (degrees Fahrenheit) High: {round(min,1)}, Low: {round(max,1)}, Average: {round(mean,1)}")
+
+@app.route("/api/v1.0/<start>/<end>")
+def dates(start, end):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    # Change the date in string format to datatime.date
+    start = dt.datetime.strptime(start, '%Y-%m-%d').date()
+    end = dt.datetime.strptime(end, '%Y-%m-%d').date()
+
+    # Perform a query to retrieve the data and precipitation scores
+    temp_data = (
+        session
+        .query(
+            func.min(Measurement.tobs), 
+            func.max(Measurement.tobs), 
+            func.avg(Measurement.tobs)
+            )
+        .filter(Measurement.date >= start)
+        .filter(Measurement.date <= end)
+        .all()
+    )
+    
+    (min, max, mean) = temp_data[0]
+
+    session.close()
+
+    return jsonify(f"Start date: {start}, End date: {end}",f"Temperature (degrees Fahrenheit) High: {round(min,1)}, Low: {round(max,1)}, Average: {round(mean,1)}")
 
 if __name__ == '__main__':
     app.run(debug=True)
