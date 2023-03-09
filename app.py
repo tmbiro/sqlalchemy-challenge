@@ -20,8 +20,8 @@ Base = automap_base()
 Base.prepare(autoload_with=engine)
 
 # Save reference to the table
-Measurement = Base.classes.measurement
-Station = Base.classes.station
+measurement = Base.classes.measurement
+station = Base.classes.station
 
 #################################################
 # Flask Setup
@@ -58,8 +58,8 @@ def precipitation():
     # Perform a query to retrieve the data and precipitation scores
     last_year_data = (
         session
-        .query(Measurement.date, Measurement.prcp) #query the measurement date and precipitation columns
-        .filter(Measurement.date >= '2016-08-23') #only keep dates that are greater than or equal to '2016-08-23'
+        .query(measurement.date, measurement.prcp) #query the measurement date and precipitation columns
+        .filter(measurement.date >= '2016-08-23') #only keep dates that are greater than or equal to '2016-08-23'
         .all()) #grab everything that matches the filter
 
     session.close()
@@ -73,7 +73,7 @@ def stations():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    station_data = session.query(Station.station, Station.name).all() #Grab stations and their names
+    station_data = session.query(station.station, station.name).all() #Grab stations and their names
 
     session.close()
 
@@ -91,9 +91,9 @@ def temperature():
     # Perform a query to retrieve the data and temperature scores
     temp_data = (
         session
-        .query(Measurement.date, Measurement.tobs) #query the measurement date and temperature columns
-        .filter(Measurement.date >= '2016-08-23') #only keep dates that are greater than or equal to '2016-08-23'
-        .filter(Measurement.station == 'USC00519281') #only keep data from the most active station
+        .query(measurement.date, measurement.tobs) #query the measurement date and temperature columns
+        .filter(measurement.date >= '2016-08-23') #only keep dates that are greater than or equal to '2016-08-23'
+        .filter(measurement.station == 'USC00519281') #only keep data from the most active station
         .all()) #grab everything that matches the filter
 
     session.close()
@@ -113,11 +113,11 @@ def date(start):
     temp_data = (
         session
         .query(
-            func.min(Measurement.tobs), #Obtain the lowest of temperature
-            func.max(Measurement.tobs), #Obtain the highest of temperature
-            func.avg(Measurement.tobs) #Obtain the average temperature
+            func.min(measurement.tobs), #Obtain the lowest of temperature
+            func.max(measurement.tobs), #Obtain the highest of temperature
+            func.avg(measurement.tobs) #Obtain the average temperature
             )
-        .filter(Measurement.date >= start) #Filter based on date
+        .filter(measurement.date >= start) #Filter based on date
         .all() #Show all
     )
     
@@ -141,12 +141,12 @@ def dates(start, end):
     temp_data = (
         session
         .query(
-            func.min(Measurement.tobs), #Obtain the lowest of temperature
-            func.max(Measurement.tobs), #Obtain the highest of temperature
-            func.avg(Measurement.tobs) #Obtain the average temperature
+            func.min(measurement.tobs), #Obtain the lowest of temperature
+            func.max(measurement.tobs), #Obtain the highest of temperature
+            func.avg(measurement.tobs) #Obtain the average temperature
             )
-        .filter(Measurement.date >= start) #Filter based on start date
-        .filter(Measurement.date <= end) #Filter based on end date
+        .filter(measurement.date >= start) #Filter based on start date
+        .filter(measurement.date <= end) #Filter based on end date
         .all() #Show all
     )
     
